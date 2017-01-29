@@ -22,18 +22,37 @@ MongoDB.once('open', function() {
 //use ngrok to generate link to be placed in twilio's app dashboard, or host on public server 
 //post request to send sms to twilio owned number 
 app.post("/message", function (req, res) {
-  console.log(req.body.Body + "\n" + req.body.From + "\n");
+  var i;
   var twilio = require('twilio');
   var Disease = require('./routes/disease/disease.model.js');
+  
+  //before I look in the database
+  console.log(req.body.Body + "\n" + req.body.From + "\n");
+  Disease.find(
+	{
+		"Symptoms" : 
+			{
+                $in : [req.params.symptom]
+            } 
+    },function (err, dataResult) {
+			if (err) {
+                console.error(err);
+                return res.status(500).send(err);
+            }
 
-    //grabs all diseases
-   Disease.find({}, function (err, dataResult) {
-	if (err) {
-		console.error(err);
-        return res.status(500).send(err);
-    }
-    console.log(dataResult);
-    res.json(dataResult);
+            //after I looked in the database
+
+            if(dataResult.length < 1) {
+                return res.send("No disease found");
+            } 
+            //console.dir(dataResult);
+            //res.send(dataResult[0]._doc.Treatment);
+            return res.send(dataResult);
+        });
+    };
+	for(i=0; i< dataResult.length; i++){
+			console.log(dataResult[i].Disease);
+	}
    });
     
   var twiml = new twilio.TwimlResponse();
@@ -46,6 +65,7 @@ app.post("/message", function (req, res) {
 
 app.get("/", function(req,res){
 	var Disease = require('./routes/disease/disease.model.js');
+	var i;
 	console.log("Test Run");
 	Disease.find({}, function (err, dataResult) {
 		if (err) {
@@ -53,9 +73,11 @@ app.get("/", function(req,res){
 			return res.status(500).send(err);
 		}
 		console.log(dataResult);
+		for(i=0; i< dataResult.length; i++){
+			console.log(dataResult[i].Disease);
+	    }
 		return res.json(dataResult);
 	});
-	res.send("");
 });
  
 http.createServer(app).listen(8080, function () {
