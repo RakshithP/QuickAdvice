@@ -5,7 +5,7 @@
   var router = express.Router();
 
   router.use('/disease', require('./disease/index.js'));    
-//  router.use('/random', require('./random'));    
+  //router.use('/random', require('./random'));    
 
   module.exports = router;
 

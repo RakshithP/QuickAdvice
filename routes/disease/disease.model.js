@@ -6,11 +6,13 @@
 
     var DiseaseSchema = new Schema({
 		Disease : String,
-		Symptoms : []
+		Symptoms : [],
+		Treatment : String,
+		Doctor : String
     }, 
     { collection : 'Diseases' }
     );
     
-module.exports = mongoose.model('Disease', DiseaseSchema);
+ module.exports = mongoose.model('Disease', DiseaseSchema);
 
 })();

@@ -3,7 +3,7 @@
 
     var Disease = require('./disease.model.js');
 
-    //grab all players
+    //grabs all diseases
     module.exports.getAll = function(req, res) { 
         Disease.find({}, function (err, dataResult) {
             if (err) {

@@ -6,7 +6,7 @@ var bodyParser = require("body-parser");
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-var api = require('./routes/api.js'); //gets api logic from path
+//var api = require('./routes/api.js'); //gets api logic from path
 
 //-------------------------MongoDB Setup-----------------------------//
 var mongoose = require('mongoose');                         
@@ -17,13 +17,25 @@ MongoDB.once('open', function() {
   console.log("mongodb connection open");
 });
 
-app.use('/api', api); //sets the API used to access the Database
+//app.use('/api', api); //sets the API used to access the Database
 
 //use ngrok to generate link to be placed in twilio's app dashboard, or host on public server 
 //post request to send sms to twilio owned number 
 app.post("/message", function (req, res) {
   console.log(req.body.Body + "\n" + req.body.From + "\n");
   var twilio = require('twilio');
+  var Disease = require('./routes/disease/disease.model.js');
+
+    //grabs all diseases
+   Disease.find({}, function (err, dataResult) {
+	if (err) {
+		console.error(err);
+        return res.status(500).send(err);
+    }
+    console.log(dataResult);
+    res.json(dataResult);
+   });
+    
   var twiml = new twilio.TwimlResponse();
   twiml.message(function(){
 		this.body('Here is your query');
@@ -32,8 +44,18 @@ app.post("/message", function (req, res) {
   res.end(twiml.toString()); 
 });
 
-app.get("/", function(req,response){
-  console.log("Hello");
+app.get("/", function(req,res){
+	var Disease = require('./routes/disease/disease.model.js');
+	console.log("Test Run");
+	Disease.find({}, function (err, dataResult) {
+		if (err) {
+			console.error(err);
+			return res.status(500).send(err);
+		}
+		console.log(dataResult);
+		return res.json(dataResult);
+	});
+	res.send("");
 });
  
 http.createServer(app).listen(8080, function () {
